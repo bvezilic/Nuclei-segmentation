@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class UNet(nn.Module):
     def __int__(self):
         super(UNet, self).__init__()
-        self.conv1_1 = nn.Conv2d(1, 32, 3)
+        self.conv1_1 = nn.Conv2d(3, 32, 3)
         self.conv1_2 = nn.Conv2d(32, 32, 3)
         self.maxpool1 = nn.MaxPool2d(2)
 
