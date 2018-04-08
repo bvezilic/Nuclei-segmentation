@@ -29,7 +29,7 @@ class NucleusDataset(Dataset):
 
                 self.train_data.append(train_img)
 
-                target_img = np.zeros(train_img.shape[:2], dtype=np.bool)
+                target_img = np.zeros(train_img.shape[:2], dtype=np.uint8)
                 for target in glob(osp.join(self.root_dir, "train", image_name, "masks", "*.png")):
                     target_img_ = cv2.imread(target, 0)
                     target_img = np.maximum(target_img, target_img_)
@@ -79,10 +79,21 @@ class Rescale:
         return cv2.resize(image, (self.output_size, self.output_size), cv2.INTER_AREA)
 
 
-class ToTensor:
+class Normalize:
     def __call__(self, image):
-        image = image.transpose((2, 0, 1))
-        return torch.from_numpy(image)
+        image = image.astype(np.float32) / 255
+        return image
+
+
+class ToTensor:
+    def __call__(self, data):
+        if len(data.shape) == 2:
+            data = np.expand_dims(data, axis=0)
+        elif len(data.shape) == 3:
+            data = data.transpose((2, 0, 1))
+        else:
+            print("Unsupported shape!")
+        return torch.from_numpy(data)
 
 
 if __name__ == "__main__":
