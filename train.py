@@ -1,3 +1,4 @@
+import os
 from data import NucleusDataset, Rescale, ToTensor, Normalize
 from model import UNet
 import torch
@@ -29,6 +30,9 @@ def train(epochs=100, batch_size=16, lr=0.001):
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     for epoch in range(epochs):
+        print('Epoch {}/{}'.format(epoch + 1, epochs))
+        print('-' * 10)
+
         running_loss = 0.0
         for batch_idx, (images, masks) in enumerate(train_loader):
             if torch.cuda.is_available():
@@ -43,11 +47,12 @@ def train(epochs=100, batch_size=16, lr=0.001):
             optimizer.step()
 
             running_loss += loss.data[0]
-            if batch_idx % 100 == 0:
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                    epoch, batch_idx * len(images), len(train_loader.dataset),
-                    100. * batch_idx / len(train_loader), running_loss/100))
-                running_loss = 0.0
+
+        epoch_loss = running_loss / len(train_loader)
+        print('Loss: {:.4f}\n'.format(epoch_loss))
+
+    os.makedirs("models", exist_ok=True)
+    torch.save(model, "models/model.pt")
 
 
 if __name__ == "__main__":
