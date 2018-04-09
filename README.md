@@ -35,7 +35,7 @@ Starter PyTorch implementation of U-Net image segmentation for Kaggle Data Scien
 > Model will be automatically saved after training in **models** directory
 5. Run `python test.py`
 
-## Test results
+## Results
 
 Here are some test samples segmentation:
 
