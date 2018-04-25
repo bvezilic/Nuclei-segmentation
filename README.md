@@ -17,7 +17,7 @@ Starter PyTorch implementation of U-Net image segmentation for Kaggle Data Scien
 
 ## Getting started
 
-1. As per usual, open terminal and clone repository `git clone https://github.com/bvezilic/Nuclei-segmentation.git`
+1. Open terminal and clone repository `git clone https://github.com/bvezilic/Nuclei-segmentation.git`
 2. Download the **train.zip** and **test.zip** from kaggle and extract the contents to **data/train** and **data/test** directory respectively.
 > Directories should look something like:
 >```
