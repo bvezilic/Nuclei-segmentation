@@ -5,7 +5,6 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import transforms
-from torch.autograd import Variable
 
 
 def train(epochs=100, batch_size=16, lr=0.001):
@@ -23,10 +22,8 @@ def train(epochs=100, batch_size=16, lr=0.001):
                        ])),
         batch_size=batch_size, shuffle=True)
 
-    model = UNet()
-    if torch.cuda.is_available():
-        model.cuda()
-
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = UNet().to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     for epoch in range(epochs):
@@ -35,9 +32,7 @@ def train(epochs=100, batch_size=16, lr=0.001):
 
         running_loss = 0.0
         for batch_idx, (images, masks) in enumerate(train_loader):
-            if torch.cuda.is_available():
-                images, masks = images.cuda(), masks.cuda()
-            images, masks = Variable(images), Variable(masks)
+            images, masks = images.to(device), masks.to(device)
 
             optimizer.zero_grad()
 
@@ -46,7 +41,7 @@ def train(epochs=100, batch_size=16, lr=0.001):
             loss.backward()
             optimizer.step()
 
-            running_loss += loss.data[0]
+            running_loss += loss.item()
 
         epoch_loss = running_loss / len(train_loader)
         print('Loss: {:.4f}\n'.format(epoch_loss))

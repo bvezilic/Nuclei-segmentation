@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import torch
 from torchvision import transforms
 from torch.utils.data import DataLoader
-from torch.autograd import Variable
 
 from data import NucleusDataset, Rescale, ToTensor, Normalize
 
@@ -18,26 +17,25 @@ def test():
                              batch_size=12,
                              shuffle=True)
 
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     model = torch.load("models/model.pt")
     model.eval()
-    use_gpu = torch.cuda.is_available()
-    if use_gpu:
-        model.cuda()
+    model.to(device)
 
-    images = next(iter(test_loader))
-    if use_gpu:
-        images = images.cuda()
-    images = Variable(images)
-    outputs = model(images)
+    with torch.no_grad():
+        images = next(iter(test_loader)).to(device)
 
-    images = tensor_to_numpy(images)
-    outputs = tensor_to_numpy(outputs)
+        outputs = model(images)
 
-    show_images(images, outputs)
+        images = tensor_to_numpy(images)
+        outputs = tensor_to_numpy(outputs)
+
+        show_images(images, outputs)
 
 
 def tensor_to_numpy(tensor):
-    t_numpy = tensor.data.cpu().numpy()
+    t_numpy = tensor.data
     t_numpy = np.transpose(t_numpy, [0, 2, 3, 1])
     t_numpy = np.squeeze(t_numpy)
 
