@@ -7,7 +7,7 @@ import torch.optim as optim
 from torchvision import transforms
 
 
-def train(epochs=100, batch_size=16, lr=0.001):
+def train(epochs=10, batch_size=16, lr=0.001):
     train_loader = torch.utils.data.DataLoader(
         NucleusDataset('data', train=True,
                        transform=transforms.Compose([
