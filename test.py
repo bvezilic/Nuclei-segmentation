@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+
 import torch
 from torchvision import transforms
 from torch.utils.data import DataLoader
@@ -35,7 +36,7 @@ def test():
 
 
 def tensor_to_numpy(tensor):
-    t_numpy = tensor.data
+    t_numpy = tensor.cpu().numpy()
     t_numpy = np.transpose(t_numpy, [0, 2, 3, 1])
     t_numpy = np.squeeze(t_numpy)
 

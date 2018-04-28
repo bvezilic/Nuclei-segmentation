@@ -1,15 +1,17 @@
 import os
-from data import NucleusDataset, Rescale, ToTensor, Normalize
-from model import UNet
+
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torchvision import transforms
 
+from data import NucleusDataset, Rescale, ToTensor, Normalize
+from model import UNet
 
-def train(epochs=10, batch_size=16, lr=0.001):
+
+def train(epochs, batch_size, learning_rate):
     train_loader = torch.utils.data.DataLoader(
-        NucleusDataset('data', train=True,
+        NucleusDataset("data", train=True,
                        transform=transforms.Compose([
                            Normalize(),
                            Rescale(256),
@@ -24,7 +26,7 @@ def train(epochs=10, batch_size=16, lr=0.001):
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = UNet().to(device)
-    optimizer = optim.Adam(model.parameters(), lr=lr)
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
     for epoch in range(epochs):
         print('Epoch {}/{}'.format(epoch + 1, epochs))
@@ -44,11 +46,21 @@ def train(epochs=10, batch_size=16, lr=0.001):
             running_loss += loss.item()
 
         epoch_loss = running_loss / len(train_loader)
-        print('Loss: {:.4f}\n'.format(epoch_loss))
+        print("Loss: {:.4f}\n".format(epoch_loss))
 
     os.makedirs("models", exist_ok=True)
     torch.save(model, "models/model.pt")
 
 
 if __name__ == "__main__":
-    train()
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--epochs", type=int, default=30)
+    parser.add_argument("-bs", "--batch_size", type=int, default=16)
+    parser.add_argument("-lr", "--learning_rate", default=0.001)
+    args = parser.parse_args()
+
+    train(epochs=args.epochs,
+          batch_size=args.batch_size,
+          learning_rate=args.learning_rate)
