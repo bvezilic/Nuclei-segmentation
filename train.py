@@ -3,8 +3,7 @@ from pathlib import Path
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from torchvision import transforms
-from torchvision.transforms import ToTensor
+from torchvision.transforms import ToTensor, Compose
 
 from data import NucleusDataset
 from losses import bce_and_dice
@@ -109,11 +108,11 @@ class Trainer:
 def train():
     # Load the data sets
     train_dataset = NucleusDataset("data", train=True,
-                                   transform=transforms.Compose([
+                                   transform=Compose([
                                        Rescale(256),
                                        ToTensor()
                                    ]),
-                                   target_transform=transforms.Compose([
+                                   target_transform=Compose([
                                        Rescale(256),
                                        ToTensor()
                                    ]))
@@ -122,7 +121,10 @@ def train():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     # Set model to GPU/CPU
-    model = UNet()
+    if args.from_checkpoint:
+        model = UNet.load(args.from_checkpoint)
+    else:
+        model = UNet()
     model.to(device)
 
     # Initialize optimizer
@@ -147,6 +149,7 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--epochs", type=int, default=30)
     parser.add_argument("-bs", "--batch_size", type=int, default=16)
     parser.add_argument("-lr", "--learning_rate", default=0.001)
+    parser.add_argument("-fc", "--from_checkpoint", type=str, default=None)
     parser.add_argument("-d", "--device", type=str, default="cpu", choices=["cpu", "cuda"])
     parser.add_argument("-o", "--output_dir", type=str, default="./models/test1")
     args = parser.parse_args()
